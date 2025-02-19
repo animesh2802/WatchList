@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const ToWatchSchema = new mongoose.Schema({
+const toWatchSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
@@ -34,4 +34,4 @@ const ToWatchSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("ToWatch", ToWatchSchema);
+module.exports = mongoose.model("ToWatch", toWatchSchema);

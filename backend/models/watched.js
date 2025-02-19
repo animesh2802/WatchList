@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const WatchedSchema = new mongoose.Schema({
+const watchedSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
@@ -21,14 +21,14 @@ const WatchedSchema = new mongoose.Schema({
     max: 10,
     default: null,
   },
-//  watchedOn: {
-//    type: Date,
-//    default: Date.now, // When the user watched it
-//  },
+  watchedOn: {
+    type: Date,
+    default: Date.now, // When the user watched it
+  },
   notes: {
     type: String, // Optional user notes
     trim: true,
   },
 });
 
-module.exports = mongoose.model("Watched", WatchedSchema);
+module.exports = mongoose.model("Watched", watchedSchema);

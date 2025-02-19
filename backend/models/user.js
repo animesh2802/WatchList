@@ -2,6 +2,16 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
 const UserSchema = new mongoose.Schema({
+  firstName: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  lastName: {
+    type: String,
+    required: true,
+    trim: true,
+  },
   username: {
     type: String,
     required: true,
@@ -18,10 +28,26 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  createdAt: {
-    type: Date,
-    default: Date.now,
+  image:{
+    type: String,
+    required: true,
   },
+  watched: [
+    {
+      type:mongoose.Schema.Types.ObjectId,
+      ref:"watched"
+    }
+  ],
+  towatch: [
+    {
+      type:mongoose.Schema.Types.ObjectId,
+      ref:"towatch"
+    }
+  ],
+  profile: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Profile'
+  }
 });
 
 // Hash the password before saving the user
@@ -37,4 +63,4 @@ UserSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-module.exports = mongoose.model("User", UserSchema);
+module.exports = mongoose.model("User", userSchema);
