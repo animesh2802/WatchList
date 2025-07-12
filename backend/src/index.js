@@ -2,7 +2,8 @@ import express from 'express'
 import dotenv from 'dotenv'
 import connectDB from './config/db.js'
 import authRoutes from './routes/auth.routes.js'
-import verifyToken from './middleware/verifyToken.js'
+import itemRoutes from './routes/items.routes.js'
+//import verifyToken from './middleware/verifyToken.js'
 
 dotenv.config();
 const app = express();
@@ -13,6 +14,8 @@ connectDB();
 app.use(express.json());
 
 app.use('/auth', authRoutes);
+
+app.use('/api/items', itemRoutes);
 
 app.get('/', (req, res) => {
     res.send("Hello from server");

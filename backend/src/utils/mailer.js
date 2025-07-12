@@ -3,8 +3,6 @@ dotenv.config();
 
 import { Resend } from 'resend';
 
-
-console.log('🔐 Resend API KEY:', process.env.RESEND_API_KEY);
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const sendOtpEmail = async (toEmail, otp) => {
