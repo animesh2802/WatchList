@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+/** {
+    margin: 0;
+    padding: 1;
+    box-sizing: border-box;
+}*/
+
+
 .scrollbar-hide::-webkit-scrollbar {
     display: none;
 }

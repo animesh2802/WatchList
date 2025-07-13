@@ -76,7 +76,7 @@ const HeroCarousel = ({ items }) => {
             </AnimatePresence>
 
             {/* Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/10 z-10 cursor-pointer" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/10 z-10" />
 
             {/* Banner Content */}
             <div className="absolute bottom-10 left-5 md:left-10 text-white max-w-xl space-y-3 z-20 ">
@@ -89,11 +89,13 @@ const HeroCarousel = ({ items }) => {
                         : currentItem.overview?.split(' ').slice(0, 20).join(' ') + '...'}
                 </p>
                 <div className="flex gap-3 mt-4">
-                    <button className="bg-white text-black font-semibold py-2 px-4 rounded hover:bg-gray-200 transition">
+                    <button className="bg-white text-black font-semibold py-2 px-4 rounded hover:bg-gray-200 transition cursor-pointer">
                         ▶ Play
                     </button>
-                    <button className="bg-gray-700 text-white font-semibold py-2 px-4 rounded hover:bg-gray-600 transition" onClick={(e)=>handleMoreInfo(e, currentItem)}>
-                        ℹ More Info
+                    <button className="flex felx-row items-center justify-center bg-gray-700 text-white font-semibold py-2 px-4 rounded hover:bg-gray-600 cursor-pointer transition" onClick={(e) => handleMoreInfo(e, currentItem)}>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="mx-2 size-7">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+                        </svg> More info
                     </button>
                 </div>
             </div>

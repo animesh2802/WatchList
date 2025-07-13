@@ -63,8 +63,9 @@ const Home = () => {
         <div className="min-h-screen bg-black text-white">
             <Navbar />
 
-            <HeroCarousel items={heroItems} />
-
+            {/* enable the below hero carousel to get Prime video and netflix like homepage */}
+            {/*<HeroCarousel items={heroItems} />*/}
+            
             <div className="p-6">
                 <CategoryRow
                     title="🔥 Trending Movies 🎬"
