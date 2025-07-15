@@ -8,6 +8,7 @@ const Details = () => {
     const { id } = useParams();
     const [item, setItem] = useState(null);
     const [scrollY, setScrollY] = useState(0);
+    const [showDropdown, setShowDropdown] = useState(false);
 
     const handleCopyLink = () => {
         navigator.clipboard.writeText(window.location.href);
@@ -40,7 +41,7 @@ const Details = () => {
             <Navbar />
 
             <section
-                className="relative w-full h-[90vh] bg-cover bg-center flex items-end text-white"
+                className="relative w-full h-[91vh] bg-cover bg-center flex items-end text-white"
                 style={{
                     backgroundImage: `url(https://image.tmdb.org/t/p/original${item.backdrop_path})`,
                 }}
@@ -97,31 +98,72 @@ const Details = () => {
                             </button>
                         )}
 
-                        <div className="relative group">
-                            <button className="bg-gray-700/80 hover:bg-gray-600 px-4 py-2 rounded-full cursor-pointer">+</button>
-                            <div className="absolute left-0 mt-2 hidden group-hover:flex flex-col gap-1 bg-gray-800 p-2 rounded shadow-lg z-20">
-                                <button className="text-sm hover:text-white">✔ Watched</button>
-                                <button className="text-sm hover:text-white">🎯 To Watch</button>
-                            </div>
+                        <div className="relative inline-block text-left">
+                            <button
+                                onClick={() => setShowDropdown((prev) => !prev)}
+                                className="bg-gray-700/80 hover:bg-gray-600 px-4 py-2 rounded-full cursor-pointer transition"
+                            >
+                                +
+                            </button>
+
+                            {showDropdown && (
+                                <div className="absolute bottom-12 left-0 mt-2 w-36 rounded-xl bg-zinc-800 shadow-lg border border-gray-600 z-50">
+                                    <div className="py-2 flex flex-col">
+                                        <button className="text-sm text-left px-3 py-1 hover:bg-gray-700 hover:text-white text-gray-300 rounded transition">
+                                            ✔ Watched
+                                        </button>
+                                        <button className="text-sm text-left px-3 py-1 hover:bg-gray-700 hover:text-white text-gray-300 rounded transition">
+                                            🎯 To Watch
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                         <button className="bg-gray-700/80 hover:bg-gray-600 px-5 py-2 rounded-full cursor-pointer"
                             onClick={handleCopyLink}
                         >
                             🔗 Share
                         </button>
-                        {item?.homepage && (
-                            <a
-                                href={item.homepage}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="bg-gray-700/80 hover:bg-gray-600 px-5 py-2 rounded-full"
+                        {item.trailerUrl && (
+                            <button
+                                onClick={() => window.open(item.trailerUrl, '_blank')}
+                                className="bg-gray-700/80 hover:bg-gray-600 px-5 py-2 rounded-full cursor-pointer"
                             >
                                 🎬 Watch Trailer
-                            </a>
+                            </button>
                         )}
+
                     </div>
                 </div>
             </section>
+
+            {/* 🎭 Cast Section */}
+            {item.credits?.cast?.length > 0 && (
+                <div className="px-8 py-6">
+                    <h2 className="text-2xl font-bold mb-4">Cast 🎭</h2>
+                    <div className="flex gap-4 overflow-x-auto scrollbar-hide">
+                        {item.credits.cast.slice(0, 12).map((actor) => (
+                            <div
+                                key={actor.id}
+                                className="min-w-[120px] flex-shrink-0 text-center"
+                            >
+                                <img
+                                    src={
+                                        actor.profile_path
+                                            ? `https://image.tmdb.org/t/p/w185${actor.profile_path}`
+                                            : 'https://via.placeholder.com/185x278?text=No+Image'
+                                    }
+                                    alt={actor.name}
+                                    className="rounded-lg w-full h-[180px] object-cover mb-2"
+                                />
+                                <h3 className="text-sm font-semibold text-white">{actor.name}</h3>
+                                <p className="text-sm text-gray-400">{actor.character}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
 
         </div>
 

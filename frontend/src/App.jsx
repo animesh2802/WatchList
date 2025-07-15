@@ -7,6 +7,7 @@ import Shows from './pages/Shows';
 import Watched from './pages/Watched';
 import ToWatch from './pages/ToWatch';
 import Details from './pages/Details';
+import SearchBar from './components/SearchBar.jsx';
 
 const App = () => {
   return (

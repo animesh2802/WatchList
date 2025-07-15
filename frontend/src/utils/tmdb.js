@@ -48,32 +48,33 @@ const BASE_URL = 'https://api.themoviedb.org/3';
 //};
 
 export const getDetailsById = async (id, mediaType = 'movie') => {
-    const region = await getUserCountry(); // detect user's region like 'US', 'IN', etc.
+    const region = await getUserCountry(); // Get region like 'IN', 'US'
 
-    const [detailsRes, creditsRes, reviewsRes, videosRes, providersRes] = await Promise.all([
-        fetch(`https://api.themoviedb.org/3/${mediaType}/${id}?api_key=${API_KEY}&language=en-US`),
-        fetch(`https://api.themoviedb.org/3/${mediaType}/${id}/credits?api_key=${API_KEY}&language=en-US`),
+    const [detailsRes, reviewsRes, providersRes] = await Promise.all([
+        fetch(`https://api.themoviedb.org/3/${mediaType}/${id}?api_key=${API_KEY}&language=en-US&append_to_response=credits,videos`),
         fetch(`https://api.themoviedb.org/3/${mediaType}/${id}/reviews?api_key=${API_KEY}&language=en-US`),
-        fetch(`https://api.themoviedb.org/3/${mediaType}/${id}/videos?api_key=${API_KEY}&language=en-US`),
         fetch(`https://api.themoviedb.org/3/${mediaType}/${id}/watch/providers?api_key=${API_KEY}`)
     ]);
 
-    const [details, credits, reviews, videos, providers] = await Promise.all([
-        detailsRes.json(),
-        creditsRes.json(),
-        reviewsRes.json(),
-        videosRes.json(),
-        providersRes.json()
-    ]);
+    const details = await detailsRes.json();
+    const reviews = await reviewsRes.json();
+    const providers = await providersRes.json();
 
     const provider = providers?.results?.[region]?.flatrate?.[0]?.provider_name || null;
 
+    // Extract trailer
+    const trailer = details.videos?.results?.find(
+        v =>
+            v.site === 'YouTube' &&
+            v.type === 'Trailer' &&
+            v.official === true
+    );
+
     return {
         ...details,
-        credits,
         reviews: reviews.results || [],
-        videos: videos.results || [],
-        streaming: provider
+        streaming: provider,
+        trailerUrl: trailer ? `https://www.youtube.com/watch?v=${trailer.key}` : null,
     };
 };
 
@@ -160,3 +161,12 @@ export const getMixedTrending = async (limit = 10, region) => {
 
     return top;
 };
+
+export const searchTMDB = async (query) => {
+    const res = await fetch(
+        `https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}&language=en-US`
+    );
+    const data = await res.json();
+    return data.results.filter((item) => item.backdrop_path); // skip results without images
+};
+
