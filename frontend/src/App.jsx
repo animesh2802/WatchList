@@ -18,7 +18,7 @@ const App = () => {
         <Route path="/shows" element={<Shows />} />
         <Route path="/watched" element={<Watched />} />
         <Route path="/to-watch" element={<ToWatch />} />
-        <Route path="/details/:id" element={<Details />} />
+        <Route path="/details/:media_type/:id" element={<Details />} />
       </Routes>
     </Router>
   );

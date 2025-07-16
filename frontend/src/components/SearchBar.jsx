@@ -44,7 +44,7 @@ const SearchBar = () => {
                         <div
                             key={item.id}
                             onClick={() => {
-                                navigate(`/details/${item.id}`);
+                                navigate(`/details/${item.media_type}/${item.id}`);
                                 setQuery('');
                                 setShowDropdown(false);
                             }}
@@ -54,10 +54,10 @@ const SearchBar = () => {
                                 src={
                                     item.poster_path
                                         ? `https://image.tmdb.org/t/p/w92${item.poster_path}`
-                                        : 'https://via.placeholder.com/92x138?text=No+Image'
+                                        : '/no-image.png' // put this file in your `public/` folder
                                 }
                                 alt={item.title || item.name}
-                                className="w-12 h-18 object-cover rounded"
+                                className="w-12 h-16 object-cover rounded"
                             />
                             <div>
                                 <p className="text-white font-medium text-sm">

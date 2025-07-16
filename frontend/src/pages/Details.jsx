@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import { getDetailsById } from '../utils/tmdb';
 
 const Details = () => {
-    const { id } = useParams();
+    const { id, media_type } = useParams();
     const [item, setItem] = useState(null);
     const [scrollY, setScrollY] = useState(0);
     const [showDropdown, setShowDropdown] = useState(false);
@@ -16,7 +16,7 @@ const Details = () => {
     };
 
     useEffect(() => {
-        getDetailsById(id, item?.media_type || 'movie')
+        getDetailsById(id, media_type || 'movie')
             .then((data) => setItem(data))
             .catch((err) => console.error('Failed to fetch details:', err));
 
@@ -34,7 +34,7 @@ const Details = () => {
     // Fade logic: 0 → visible, 300+px → fully black
     const fadeOpacity = Math.min(scrollY / 300, 1);
 
-    console.log('Backdrop:', item.backdrop_path);
+    //console.log('Backdrop:', item.backdrop_path);
 
     return (
         <div className="min-h-screen bg-black text-white">

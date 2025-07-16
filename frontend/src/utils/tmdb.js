@@ -169,4 +169,3 @@ export const searchTMDB = async (query) => {
     const data = await res.json();
     return data.results.filter((item) => item.backdrop_path); // skip results without images
 };
-
