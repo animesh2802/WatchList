@@ -9,19 +9,19 @@ let region = 'IN';
 (async () => {
     try {
         region = await getUserCountry();
-        console.log(region);
+        console.log("country: ", region);
     } catch (err) {
         console.error('Failed to fetch region:', err);
     }
 })();
 
 
-export const getDetailsById = async (id, mediaType) => {
+export const getDetailsById = async (id, media_type) => {
 
     const [detailsRes, reviewsRes, providersRes] = await Promise.all([
-        fetch(`https://api.themoviedb.org/3/${mediaType}/${id}?api_key=${API_KEY}&language=en-US&append_to_response=credits,videos`),
-        fetch(`https://api.themoviedb.org/3/${mediaType}/${id}/reviews?api_key=${API_KEY}&language=en-US`),
-        fetch(`https://api.themoviedb.org/3/${mediaType}/${id}/watch/providers?api_key=${API_KEY}`)
+        fetch(`https://api.themoviedb.org/3/${media_type}/${id}?api_key=${API_KEY}&language=en-US&append_to_response=credits,videos`),
+        fetch(`https://api.themoviedb.org/3/${media_type}/${id}/reviews?api_key=${API_KEY}&language=en-US`),
+        fetch(`https://api.themoviedb.org/3/${media_type}/${id}/watch/providers?api_key=${API_KEY}`)
     ]);
 
     const details = await detailsRes.json();
@@ -96,7 +96,15 @@ const fetchGenreItems = async (genreId, label, media_type, totalPages = 2, regio
     // Flatten and tag each result with media_type
     return results
         .flatMap(data => data.results || [])
-        .map(item => ({ ...item, genreLabel: label }));
+        .map(item => ({ ...item, genreLabel: label, media_type }));
+};
+
+export const getMovieGenreCategory = async (genreId, label) => {
+    return await fetchGenreItems(genreId, label, 'movie', 2, region);
+};
+
+export const getShowGenreCategory = async (genreId, label) => {
+    return await fetchGenreItems(genreId, label, 'tv', 2, region);
 };
 
 export const getGenreCategory = async (genreId, label, region) => {
@@ -139,3 +147,5 @@ export const searchTMDB = async (query) => {
     const data = await res.json();
     return data.results.filter((item) => item.backdrop_path); // skip results without images
 };
+
+

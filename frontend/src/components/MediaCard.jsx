@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
@@ -10,6 +9,7 @@ const MediaCard = ({ item, index, onMarkWatched, onAddToWatch }) => {
 
     const handleCardClick = () => {
         navigate(`/details/${item.media_type}/${item.id}`);
+        //console.log("Navigating to:", item.media_type, item.id);
     };
 
     return (
@@ -25,6 +25,9 @@ const MediaCard = ({ item, index, onMarkWatched, onAddToWatch }) => {
             <img
                 src={`${IMAGE_BASE_URL}${item.poster_path}`}
                 alt={item.title || item.name}
+                onError={(e) => {
+                    e.currentTarget.src = '/images/no_poster.png';
+                }}
                 className="h-full w-[217px] object-cover transition-all delay-400 duration-240 ease-in-out group-hover:w-[180px]"
             />
 

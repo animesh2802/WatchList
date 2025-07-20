@@ -27,7 +27,7 @@ const Details = () => {
 
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
-    }, [id]);
+    }, [id, media_type]);
 
     if (!item) return <div className="text-white p-4">Loading...</div>;
 
@@ -41,101 +41,103 @@ const Details = () => {
             <Navbar />
 
             <section
-                className="relative w-full h-[91vh] bg-cover bg-center flex items-end text-white"
-                style={{
-                    backgroundImage: `url(https://image.tmdb.org/t/p/original${item.backdrop_path})`,
-                }}
-            >
-                {/* Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-r from-black via-transparent to-black opacity-90" />
+    className="relative w-full h-[91vh] bg-cover bg-center flex items-end text-white"
+    style={{
+        backgroundImage: `url(https://image.tmdb.org/t/p/original${item.backdrop_path})`,
+    }}
+>
+    {/* Overlay: Gradient now starts from bottom-left and fades to top-right */}
+    <div className="absolute inset-0 bg-gradient-to-tr from-black to-transparent" />
 
-                {/* Content */}
-                <div className="relative z-10 px-12 py-20 max-w-4xl">
-                    <h1 className="text-5xl font-extrabold mb-4 drop-shadow-md">
-                        {item.title || item.name}
-                    </h1>
+    {/* Content: Unchanged */}
+    <div className="relative z-10 px-12 py-20 max-w-4xl">
+        <h1 className="text-5xl font-extrabold mb-4 drop-shadow-lg">
+            {item.title || item.name}
+        </h1>
 
-                    <p className="text-lg text-gray-300 mb-4 max-w-2xl drop-shadow-sm">
-                        {item.overview}
-                    </p>
+        <p className="text-lg text-gray-200 mb-4 max-w-2xl drop-shadow-md">
+            {item.overview}
+        </p>
 
-                    {/* Info Row */}
-                    <div className="flex gap-4 text-sm text-gray-400 mb-4">
-                        <span>{item.release_date || item.first_air_date}</span>
-                        <span>|</span>
-                        <span>{item.vote_average.toFixed(1)}/10 ★</span>
-                        <span>|</span>
-                        <span>
-                            {item.runtime
-                                ? `${Math.floor(item.runtime / 60)}h ${item.runtime % 60}min`
-                                : item.episode_run_time?.[0]
-                                    ? `${Math.floor(item.episode_run_time[0] / 60)}h ${item.episode_run_time[0] % 60}min`
-                                    : 'N/A'}
-                        </span>
-                    </div>
+        {/* Info Row */}
+        <div className="flex items-center gap-4 text-sm text-gray-300 mb-4 drop-shadow-md">
+            <span>{item.release_date || item.first_air_date}</span>
+            <span className="opacity-50">|</span>
+            <span className="flex items-center gap-1.5">
+                <span className="text-yellow-400">★</span>
+                {item.vote_average.toFixed(1)}/10
+            </span>
+            <span className="opacity-50">|</span>
+            <span>
+                {item.runtime
+                    ? `${Math.floor(item.runtime / 60)}h ${item.runtime % 60}min`
+                    : item.episode_run_time?.[0]
+                        ? `${Math.floor(item.episode_run_time[0] / 60)}h ${item.episode_run_time[0] % 60}min`
+                        : 'N/A'}
+            </span>
+        </div>
 
-                    {/* Genres */}
-                    <div className="flex flex-wrap gap-2 mb-6">
-                        {item.genres?.map((genre) => (
-                            <span
-                                key={genre.id}
-                                className="px-3 py-1 bg-white/10 text-sm rounded-full border border-white/20"
-                            >
-                                {genre.name}
-                            </span>
-                        ))}
-                    </div>
+        {/* Genres */}
+        <div className="flex flex-wrap gap-2 mb-6">
+            {item.genres?.map((genre) => (
+                <span
+                    key={genre.id}
+                    className="px-3 py-1 bg-white/10 text-sm rounded-full border border-white/20 backdrop-blur-sm"
+                >
+                    {genre.name}
+                </span>
+            ))}
+        </div>
 
-                    {/* Action Buttons */}
-                    <div className="flex gap-3">
-                        {item.streaming ? (
-                            <button className="bg-gray-700 hover:bg-gray-600 px-5 py-2 rounded-full font-semibold">
-                                ▶️ Watch on {item.streaming}
+        {/* Action Buttons (Unchanged) */}
+        <div className="flex gap-3">
+            {item.streaming ? (
+                <button className="bg-gray-700 hover:bg-gray-600 px-5 py-2 rounded-full font-semibold">
+                    ▶️ Watch on {item.streaming}
+                </button>
+            ) : (
+                <button disabled className="bg-gray-700 px-5 py-2 rounded-lg font-semibold opacity-70 cursor-not-allowed">
+                    Still Not Available to Stream
+                </button>
+            )}
+
+            <div className="relative inline-block text-left">
+                <button
+                    onClick={() => setShowDropdown((prev) => !prev)}
+                    className="bg-gray-700/80 hover:bg-gray-600 px-4 py-2 rounded-full cursor-pointer transition"
+                >
+                    +
+                </button>
+
+                {showDropdown && (
+                    <div className="absolute bottom-12 left-0 mt-2 w-36 rounded-xl bg-zinc-800 shadow-lg border border-gray-600 z-50">
+                        <div className="py-2 flex flex-col">
+                            <button className="text-sm text-left px-3 py-1 hover:bg-gray-700 hover:text-white text-gray-300 rounded transition">
+                                ✔ Watched
                             </button>
-                        ) : (
-                            <button disabled className="bg-gray-700 px-5 py-2 rounded-lg font-semibold opacity-70 cursor-not-allowed">
-                                Still Not Available to Stream
+                            <button className="text-sm text-left px-3 py-1 hover:bg-gray-700 hover:text-white text-gray-300 rounded transition">
+                                🎯 To Watch
                             </button>
-                        )}
-
-                        <div className="relative inline-block text-left">
-                            <button
-                                onClick={() => setShowDropdown((prev) => !prev)}
-                                className="bg-gray-700/80 hover:bg-gray-600 px-4 py-2 rounded-full cursor-pointer transition"
-                            >
-                                +
-                            </button>
-
-                            {showDropdown && (
-                                <div className="absolute bottom-12 left-0 mt-2 w-36 rounded-xl bg-zinc-800 shadow-lg border border-gray-600 z-50">
-                                    <div className="py-2 flex flex-col">
-                                        <button className="text-sm text-left px-3 py-1 hover:bg-gray-700 hover:text-white text-gray-300 rounded transition">
-                                            ✔ Watched
-                                        </button>
-                                        <button className="text-sm text-left px-3 py-1 hover:bg-gray-700 hover:text-white text-gray-300 rounded transition">
-                                            🎯 To Watch
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
                         </div>
-                        <button className="bg-gray-700/80 hover:bg-gray-600 px-5 py-2 rounded-full cursor-pointer"
-                            onClick={handleCopyLink}
-                        >
-                            🔗 Share
-                        </button>
-                        {item.trailerUrl && (
-                            <button
-                                onClick={() => window.open(item.trailerUrl, '_blank')}
-                                className="bg-gray-700/80 hover:bg-gray-600 px-5 py-2 rounded-full cursor-pointer"
-                            >
-                                🎬 Watch Trailer
-                            </button>
-                        )}
-
                     </div>
-                </div>
-            </section>
+                )}
+            </div>
+            <button className="bg-gray-700/80 hover:bg-gray-600 px-5 py-2 rounded-full cursor-pointer"
+                onClick={handleCopyLink}
+            >
+                🔗 Share
+            </button>
+            {item.trailerUrl && (
+                <button
+                    onClick={() => window.open(item.trailerUrl, '_blank')}
+                    className="bg-gray-700/80 hover:bg-gray-600 px-5 py-2 rounded-full cursor-pointer"
+                >
+                    🎬 Watch Trailer
+                </button>
+            )}
+        </div>
+    </div>
+</section>
 
             {/* 🎭 Cast Section */}
             {item.credits?.cast?.length > 0 && (
@@ -154,6 +156,9 @@ const Details = () => {
                                             : 'https://via.placeholder.com/185x278?text=No+Image'
                                     }
                                     alt={actor.name}
+                                    onError={(e) => {
+                                        e.currentTarget.src = '/images/no_dp.webp';
+                                    }}
                                     className="rounded-lg w-full h-[180px] object-cover mb-2"
                                 />
                                 <h3 className="text-sm font-semibold text-white">{actor.name}</h3>
