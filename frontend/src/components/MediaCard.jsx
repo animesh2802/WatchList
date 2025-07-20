@@ -9,7 +9,7 @@ const MediaCard = ({ item, index, onMarkWatched, onAddToWatch }) => {
     const navigate = useNavigate();
 
     const handleCardClick = () => {
-        navigate(`/details/${item.id}`);
+        navigate(`/details/${item.media_type}/${item.id}`);
     };
 
     return (

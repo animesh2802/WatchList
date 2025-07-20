@@ -46,7 +46,7 @@ const HeroCarousel = ({ items }) => {
 
     const handleMoreInfo = (e, item) => {
         e.stopPropagation(); // 🛑 Prevent bubbling
-        navigate(`/details/${item.id}`);
+        navigate(`/details/${item.media_type}/${item.id}`);
     };
 
     const toggleSummary = (e) => {

@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import HeroCarousel from '../components/HeroCarousel';
 import CategoryRow from '../components/CategoryRow';
-import { getUserCountry } from '../utils/getUserCountry';
 import { getTrendingMovies, getTrendingTV, getGenreCategory, getMixedTrending } from '../utils/tmdb';
+//import { getUserCountry } from '../utils/getUserCountry';
 
 const Home = () => {
 
@@ -11,27 +11,28 @@ const Home = () => {
     const [trendingTV, setTrendingTV] = useState([]);
     const [genreRows, setGenreRows] = useState([]);
     const [heroItems, setHeroItems] = useState([]);
+    const [region, setRegion] = useState('IN');
 
     const genres = [
         { id: 878, label: '🚀 Sci-Fi' },
+        { id: 27, label: '😱 Horror' },
         { id: 28, label: '🧨 Action' },
         { id: '9648,53', label: '🕵️ Mystery & Thriller' }, // combining 2 genres
-        { id: 27, label: '😱 Horror' },
         { id: 35, label: '😂 Comedy' },
         { id: 18, label: '🎭 Drama' },
-        { id: 10749, label: '❤️ Romance' }
+        //{ id: 10749, label: '❤️ Romance' }
     ];
 
     useEffect(() => {
         const fetchAll = async () => {
-            const region = await getUserCountry(); // e.g., "IN"
-            console.log(region);
 
             try {
+                setRegion();
+
                 const [movies, tv, mixed] = await Promise.all([
-                    getTrendingMovies(region),
-                    getTrendingTV(region),
-                    getMixedTrending(10, region)
+                    getTrendingMovies(),
+                    getTrendingTV(),
+                    getMixedTrending(10)
                 ]);
 
                 setTrendingMovies(movies);
@@ -43,7 +44,7 @@ const Home = () => {
 
             try {
                 const allGenreData = await Promise.all(
-                    genres.map(g => getGenreCategory(g.id, g.label, region))
+                    genres.map(g => getGenreCategory(g.id, g.label))
                 );
                 const rows = genres.map((g, idx) => ({
                     title: g.label,
@@ -65,7 +66,7 @@ const Home = () => {
 
             {/* enable the below hero carousel to get Prime video and netflix like homepage */}
             {/*<HeroCarousel items={heroItems} />*/}
-            
+
             <div className="p-6">
                 <CategoryRow
                     title="🔥 Trending Movies 🎬"

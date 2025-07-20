@@ -4,7 +4,6 @@ import ReactDOM from 'react-dom/client';
 import { Toaster } from 'react-hot-toast';
 import App from './App.jsx';
 import './index.css';
-import SearchBar from './components/SearchBar.jsx';
 import { SearchProvider } from './context/SearchContext.jsx';
 
 ReactDOM.createRoot(document.getElementById('root')).render(

@@ -16,7 +16,7 @@ const Details = () => {
     };
 
     useEffect(() => {
-        getDetailsById(id, media_type || 'movie')
+        getDetailsById(id, media_type)
             .then((data) => setItem(data))
             .catch((err) => console.error('Failed to fetch details:', err));
 
@@ -94,7 +94,7 @@ const Details = () => {
                             </button>
                         ) : (
                             <button disabled className="bg-gray-700 px-5 py-2 rounded-lg font-semibold opacity-70 cursor-not-allowed">
-                                Not Still Available to Stream
+                                Still Not Available to Stream
                             </button>
                         )}
 

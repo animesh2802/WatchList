@@ -3,52 +3,20 @@ import { getUserCountry } from './getUserCountry';
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const BASE_URL = 'https://api.themoviedb.org/3';
 
-///**
-// * Fetch TMDB data from any endpoint
-// */
-//async function fetchFromTMDB(endpoint, params = {}) {
-//    const url = new URL(`${BASE_URL}${endpoint}`);
-//    url.searchParams.set('api_key', API_KEY);
+let region = 'IN';
 
-//    for (const key in params) {
-//        url.searchParams.set(key, params[key]);
-//    }
+// Fetch region once at module init
+(async () => {
+    try {
+        region = await getUserCountry();
+        console.log(region);
+    } catch (err) {
+        console.error('Failed to fetch region:', err);
+    }
+})();
 
-//    const response = await fetch(url);
-//    if (!response.ok) throw new Error(`TMDB fetch failed: ${response.status}`);
-//    return await response.json();
-//}
 
-///**
-// * Get trending content
-// */
-//export const getTrending = (mediaType = 'all', timeWindow = 'day') => {
-//    return fetchFromTMDB(`/trending/${mediaType}/${timeWindow}`);
-//};
-
-///**
-// * Get top rated movies or shows
-// */
-//export const getTopRated = (mediaType = 'movie') => {
-//    return fetchFromTMDB(`/${mediaType}/top_rated`);
-//};
-
-///**
-// * Get movie or show details
-// */
-//export const getDetails = (mediaType, id) => {
-//    return fetchFromTMDB(`/${mediaType}/${id}`);
-//};
-
-///**
-// * Get popular content
-// */
-//export const getPopular = (mediaType = 'movie') => {
-//    return fetchFromTMDB(`/${mediaType}/popular`);
-//};
-
-export const getDetailsById = async (id, mediaType = 'movie') => {
-    const region = await getUserCountry(); // Get region like 'IN', 'US'
+export const getDetailsById = async (id, mediaType) => {
 
     const [detailsRes, reviewsRes, providersRes] = await Promise.all([
         fetch(`https://api.themoviedb.org/3/${mediaType}/${id}?api_key=${API_KEY}&language=en-US&append_to_response=credits,videos`),
@@ -80,21 +48,22 @@ export const getDetailsById = async (id, mediaType = 'movie') => {
 
 
 
-export const getTrendingMovies = async (region) => {
+export const getTrendingMovies = async () => {
+
     const res = await fetch(
-        `https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`
+        `https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}&region=${region}`
     );
     const data = await res.json();
-    return data.results.map(item => ({ ...item, media_type: 'movie' }));
+    return data.results.map(item => ({ ...item }));
 };
 
-export const getTrendingTV = async (region, numberOfPages = 2) => { // Added numberOfPages parameter
+export const getTrendingTV = async (numberOfPages = 2) => { // Added numberOfPages parameter
     const ANIMATION_GENRE_ID = 16;
     let allResults = [];
 
     for (let page = 1; page <= numberOfPages; page++) {
         const res = await fetch(
-            `https://api.themoviedb.org/3/trending/tv/week?api_key=${API_KEY}&page=${page}` // Added page parameter
+            `${BASE_URL}/trending/tv/week?api_key=${API_KEY}&page=${page}&region=${region}` // Added page parameter
         );
         const data = await res.json();
 
@@ -107,18 +76,18 @@ export const getTrendingTV = async (region, numberOfPages = 2) => { // Added num
             return item.genre_ids && !item.genre_ids.includes(ANIMATION_GENRE_ID);
         });
 
-        allResults = allResults.concat(filteredResults.map(item => ({ ...item, media_type: 'tv' })));
+        allResults = allResults.concat(filteredResults.map(item => ({ ...item })));
     }
 
     return allResults;
 }
 
 
-const fetchGenreItems = async (genreId, label, type, totalPages = 2, region) => {
+const fetchGenreItems = async (genreId, label, media_type, totalPages = 2, region) => {
     const promises = [];
 
     for (let page = 1; page <= totalPages; page++) {
-        const url = `${BASE_URL}/discover/${type}?api_key=${API_KEY}&with_genres=${genreId}&sort_by=popularity.desc&page=${page}&language=en-US&vote_count.gte=100`;
+        const url = `${BASE_URL}/discover/${media_type}?api_key=${API_KEY}&with_genres=${genreId}&sort_by=popularity.desc&page=${page}&language=en-US&vote_count.gte=100&region=${region}`;
         promises.push(fetch(url).then(res => res.json()));
     }
 
@@ -127,22 +96,23 @@ const fetchGenreItems = async (genreId, label, type, totalPages = 2, region) => 
     // Flatten and tag each result with media_type
     return results
         .flatMap(data => data.results || [])
-        .map(item => ({ ...item, media_type: type, genreLabel: label }));
+        .map(item => ({ ...item, genreLabel: label }));
 };
 
 export const getGenreCategory = async (genreId, label, region) => {
     const [movies, shows] = await Promise.all([
-        fetchGenreItems(genreId, label, 'movie'),
-        fetchGenreItems(genreId, label, 'tv')
+        fetchGenreItems(genreId, label, 'movie', region),
+        fetchGenreItems(genreId, label, 'tv', region)
     ]);
     return [...movies, ...shows];
 };
 
 // ✅ NEW: Mixed trending list for HeroCarousel
-export const getMixedTrending = async (limit = 10, region) => {
+export const getMixedTrending = async (limit = 10) => {
+
     const [movies, shows] = await Promise.all([
-        getTrendingMovies(),
-        getTrendingTV()
+        getTrendingMovies(region),
+        getTrendingTV(region)
     ]);
 
     const combined = [...(movies || []), ...(shows || [])];
@@ -164,7 +134,7 @@ export const getMixedTrending = async (limit = 10, region) => {
 
 export const searchTMDB = async (query) => {
     const res = await fetch(
-        `https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}&language=en-US`
+        `${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}&language=en-US`
     );
     const data = await res.json();
     return data.results.filter((item) => item.backdrop_path); // skip results without images
