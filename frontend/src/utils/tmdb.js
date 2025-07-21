@@ -15,37 +15,53 @@ let region = 'IN';
     }
 })();
 
+const safeFetch = async (url) => {
+    try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+        return await res.json();
+    } catch (err) {
+        console.error("Failed to fetch:", url, err.message);
+        return null;
+    }
+};
 
 export const getDetailsById = async (id, media_type) => {
-
-    const [detailsRes, reviewsRes, providersRes] = await Promise.all([
-        fetch(`https://api.themoviedb.org/3/${media_type}/${id}?api_key=${API_KEY}&language=en-US&append_to_response=credits,videos`),
-        fetch(`https://api.themoviedb.org/3/${media_type}/${id}/reviews?api_key=${API_KEY}&language=en-US`),
-        fetch(`https://api.themoviedb.org/3/${media_type}/${id}/watch/providers?api_key=${API_KEY}`)
+    const [details, credits, videos, reviews, providers] = await Promise.all([
+        safeFetch(`https://api.themoviedb.org/3/${media_type}/${id}?api_key=${API_KEY}&language=en-US`),
+        safeFetch(`https://api.themoviedb.org/3/${media_type}/${id}/credits?api_key=${API_KEY}&language=en-US`),
+        safeFetch(`https://api.themoviedb.org/3/${media_type}/${id}/videos?api_key=${API_KEY}&language=en-US`),
+        safeFetch(`https://api.themoviedb.org/3/${media_type}/${id}/reviews?api_key=${API_KEY}&language=en-US`),
+        safeFetch(`https://api.themoviedb.org/3/${media_type}/${id}/watch/providers?api_key=${API_KEY}`)
     ]);
 
-    const details = await detailsRes.json();
-    const reviews = await reviewsRes.json();
-    const providers = await providersRes.json();
+    if (!details) {
+        throw new Error("Failed to fetch item details.");
+    }
+
+    const trailer = videos?.results?.find(
+        v => v.site === 'YouTube' && v.type === 'Trailer' && v.official
+    );
 
     const provider = providers?.results?.[region]?.flatrate?.[0]?.provider_name || null;
 
-    // Extract trailer
-    const trailer = details.videos?.results?.find(
-        v =>
-            v.site === 'YouTube' &&
-            v.type === 'Trailer' &&
-            v.official === true
-    );
-
     return {
         ...details,
-        reviews: reviews.results || [],
+        credits, // full cast from dedicated endpoint
+        reviews: reviews?.results || [],
         streaming: provider,
         trailerUrl: trailer ? `https://www.youtube.com/watch?v=${trailer.key}` : null,
     };
 };
 
+export const getSeasonDetails = async (id, seasonNumber, media_type) => {
+    const response = await fetch(
+        `https://api.themoviedb.org/3/${media_type}/${id}/season/${seasonNumber}?api_key=${API_KEY}&language=en-US`
+    );
+
+    if (!response.ok) throw new Error("Failed to fetch season details");
+    return await response.json();
+};
 
 
 export const getTrendingMovies = async () => {
